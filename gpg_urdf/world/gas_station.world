@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+    <uri>model://ground_plane</uri>
+    </include>
+    <include>
+    <uri>model://sun</uri></include>
+    <include>
+      <uri>model://gas_station</uri>
+      <name>gas_station</name>
+      <pose>-3.0 13.5 0 0 0 0</pose>
+    </include>
+    <model name="sphere">
+      <pose> 2 1.0 0.25 0 0 0</pose>
+      <static>true</static>
+      <collision name="collision">
+        <geometry>
+          <sphere>
+            <radius> 0.25 </radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <link name="link">
+        <inertial>
+          <mass>1.0</mass>
+          <inertia> 
+            <ixx>0.1</ixx>      
+            <ixy>0.0</ixy>      
+            <ixz>0.0</ixz>      
+            <iyy>0.1</iyy>      
+            <iyz>0.0</iyz>      
+            <izz>0.1</izz>      
+          </inertia>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius> 0.25 </radius>
+            </sphere>
+          </geometry>
+          <material> <!-- sphere material -->
+            <ambient>1.0 0.0 0.0 1</ambient>
+            <diffuse> 0.0 0.0 0.0 1</diffuse>
+            <specular>0.5 0 0 0</specular>
+            
+        </material> 
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

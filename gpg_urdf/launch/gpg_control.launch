@@ -1,0 +1,28 @@
+<launch>
+  <!-- Launch Gazebo-->
+  <arg name="rvizconfig" default="$(find gpg_urdf)/rviz/urdf.rviz" />
+  <include file ="$(find gpg_urdf)/launch/gpg_gazebo_xacro.launch"/>
+  <rosparam file="$(find gpg_urdf)/config/gpg_urdf.yaml" ns="/gpg" command="load"/>
+
+  <group ns="/gpg">
+    <node name="fake_depth" pkg="gpg_urdf" type="fake_depth_publisher.py" respawn="false" output="screen" />
+    
+    <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="30.0" />
+    </node>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" args="--shutdown-timeout 1 mobile_base_controller joint_state_controller servo_controller "/>
+  </group>
+
+  <node name="rviz_teleop" pkg="rviz" type="rviz" respawn="false"
+  output="screen" args="-d $(find gpg_urdf)/config/teleop.rviz"/>
+
+  <node pkg="gpg_urdf" name="send_goal" type="send_random_goal.py"/>
+  <node pkg="gpg_urdf" name="build_gpg_frame" type="gpg_frame_broadcaster.py"/>
+  <node pkg="gpg_urdf" name="get_model_pos" type="model_state_to_pose.py" args="robot"/>
+  <node pkg="gpg_urdf" name="move2goal" type="gpg_frame_listener.py"/>
+  <node pkg="gpg_urdf" name="getimage" type="get_image.py"/>
+  
+
+</launch>

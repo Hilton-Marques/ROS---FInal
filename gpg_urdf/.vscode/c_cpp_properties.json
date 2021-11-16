@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/hilton/catkin_ws/devel_isolated/turtlesim_test/include/**",
+        "/home/hilton/catkin_ws/devel_isolated/beginner_tutorials/include/**",
+        "/home/hilton/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/hilton/catkin_ws/src/beginner_tutorials/include/**",
+        "/home/hilton/catkin_ws/src/learning_tf2/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}

@@ -1,0 +1,37 @@
+# Controlador Diferencial para as Rodas
+mobile_base_controller:
+  type: "diff_drive_controller/DiffDriveController"
+  publish_rate: 50
+  left_wheel: 'left_wheel'
+  right_wheel: 'right_wheel'
+  wheel_separation: 0.15
+  wheel_radius : 0.035
+  pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+  twist_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 1000.0]
+  base_frame_id: base_link
+# Velocity and acceleration limits for the robot
+  linear:
+    x:
+      has_velocity_limits: true
+      max_velocity: 0.2
+  angular:
+    z:
+      has_velocity_limits: true
+      max_velocity: 3.14
+
+# Controlador Servo Motor da Camera
+servo_controller:
+  type: "position_controllers/JointPositionController"
+  joint: 'servo'
+
+# Controlador "geral?"
+joint_state_controller:
+  type: "joint_state_controller/JointStateController"
+  publish_rate: 50
+
+# Parametros PID
+gazebo_ros_control:
+  pid_gains:
+    left_wheel: {p: 0.1, i: 0.01, d: 0.0}
+    right_wheel: {p: 0.1, i: 0.01, d: 0.0}
+    servo: {p: 1, i: 0.01, d: 0.1}

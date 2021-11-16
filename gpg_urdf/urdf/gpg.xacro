@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro= "http://www.ros.org/wiki/xacro" name="GoPiGo3">
+<xacro:property name="width_base" value="0.01"/>
+<xacro:property name="radius_base" value="0.075"/>
+<xacro:property name="radius_wheel" value="0.0350"/>
+<xacro:property name="width_wheel" value="0.02"/>
+<xacro:property name="pi" value="3.1415"/>
+<xacro:property name="camera_height" value="0.065"/>
+<xacro:property name="counter_weight_radius" value="0.0150">
+
+</xacro:property>
+<material name="red">
+    <color rgba="1.0 0.0 0.0 1.0"/>
+</material>
+<material name="yellow">
+    <color rgba="1.0 1.0 0.0 1.0"/>
+</material>
+<xacro:macro name="default_inertia" params="mass">
+    <inertial>
+        <mass value="${mass/10}"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+</xacro:macro>
+<xacro:macro name="wheel" params="preffix">
+    <link name="${preffix}_wheel">
+        <visual>         
+            <geometry>
+                <cylinder radius="${radius_wheel}" length="${width_wheel}"/>
+            </geometry>
+             <material name="yellow"/>
+            <origin rpy="${pi/2} 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${radius_wheel}" length="${width_wheel}"/>                
+            </geometry>
+            <origin rpy="${pi/2} 0.0 0.0" xyz="0.0 0.0 0.0"/>            
+        </collision>
+        <xacro:default_inertia mass="1.0"/>
+    </link>
+    <!-- Transmission Elements-->
+<gazebo reference="${preffix}_wheel">
+    <material>
+        Gazebo/Grey
+    </material>
+</gazebo>
+    <transmission name="${preffix}_wheel_trans">
+        <type>
+            transmission_interface/SimpleTransmission
+        </type>
+        <actuator name="${preffix}_wheel_motor">
+            <mechanicalReduction>
+                1.0
+            </mechanicalReduction>
+        </actuator>
+        <joint name="${preffix}_wheel_to_base_link" type="continuous">
+            <hardwareInterface>
+                hardware_interface/VelocityJointInterface
+            </hardwareInterface>
+        </joint>
+</transmission>
+</xacro:macro>
+
+<xacro:macro name="wheel_joint" params="preffix orientation">
+    <joint name="${preffix}_wheel_to_base_link" type="continuous">
+        <parent link="base_link"/>
+        <child  link="${preffix}_wheel"/>
+        <origin xyz="0.0 ${orientation*(radius_base+(width_wheel/2))} ${radius_wheel}" rpy="0.0 0.0 0.0"/>
+        <axis xyz="0.0 1.0 0.0"/>
+    </joint>
+</xacro:macro>
+
+<link name="base_link">
+    <visual>
+        <geometry>
+            <cylinder radius="${radius_base}" length="${width_base}"/>                
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 ${radius_wheel}"/>
+        <material name="red"/>
+    </visual>
+    <collision>
+        <geometry>
+            <cylinder radius="${radius_base}" length="${width_base}"/>                
+        </geometry>
+            <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 ${radius_wheel}"/>            
+    </collision>
+    <xacro:default_inertia mass="1.0"/>
+</link>
+<xacro:wheel_joint preffix="right" orientation="-1.0"/>
+<xacro:wheel preffix="right"/>
+<xacro:wheel_joint preffix="left" orientation="1.0"/>
+<xacro:wheel preffix="left"/>
+<joint name="counter_weight_to_base_link" type="fixed">
+    <parent link="base_link"/>
+    <child  link="counter_weight"/>
+    <origin xyz="${-1*radius_base/2}  0.0 ${radius_wheel - counter_weight_radius - width_base/2}"/>
+    <axis xyz="1.0 0.0 0.0"/>
+</joint>
+<link name="counter_weight">
+    <visual>         
+        <geometry>
+            <sphere radius="${counter_weight_radius}"/>
+        </geometry>
+        <origin rpy="0.0 0 0.0" xyz="0.0 0.0 0.0"/> 
+        <material name="red"/>
+    </visual>
+    <collision>
+        <geometry>
+            <sphere radius="${counter_weight_radius}"/>
+        </geometry>
+        <origin rpy="0.0 0 0.0" xyz="0.0 0.0 0.0"/> 
+    </collision>
+    <xacro:default_inertia mass="3.0"/>
+    <gazebo reference="$counter_weight">
+        <mu1 value="0.0"/>
+        <mu2 value="0.0"/>
+        <material>
+            Gazebo/Red
+        </material>
+    </gazebo>
+</link>
+<joint name="camera_link_to_base_link" type="revolute">
+    <parent link="base_link"/>
+    <child  link="camera_link"/>
+    <origin xyz="${radius_base} 0.0 ${camera_height}" rpy="${-pi/2} 0 ${-pi/2}"/>
+    <axis xyz="0.0 -1.0 0.0"/>
+    <limit lower="${-1*pi}" upper="${pi}" effort="1000" velocity="0.1"/>
+</joint>
+<link name="camera_link">
+    <visual>         
+        <geometry>
+            <box size="${camera_height/2} ${camera_height} ${width_base}"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+         <material name="red"/>
+    </visual>
+    <collision>
+        <geometry>
+            <box size="${camera_height/2} ${camera_height} ${width_base}"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>            
+    </collision>
+    <xacro:default_inertia mass="1.0"/>
+</link>
+
+<transmission name= "servo">
+    <type>
+         transmission_interface/SimpleTransmisssion
+    </type>
+    <actuator name="servo_motor">
+        <mechanicalReduction>
+            1.0
+        </mechanicalReduction>
+    </actuator>
+    <joint name="camera_link_to_base_link" >
+        <hardwareInterface>
+            hardware_interface/PositionJointInterface
+        </hardwareInterface>
+    </joint>
+</transmission>
+  <!-- camera -->
+
+<!-- Gazebo -->
+<gazebo reference="camera_link">
+    <sensor name="camera_1" type="camera" update_rate="30.0">
+    <parent link="camera_link"/>
+    <camera name="head">
+    <horizontal_fov>0.785398</horizontal_fov>
+    <pose>0 0 0 ${pi/2} ${-pi/2} 0 </pose>
+    <image width="320" height="240" format="RGB8"/>
+    <clip>
+        <near>0.02</near>
+        <far> 300</far>
+    </clip>
+    <distortion>
+        <k1>0.0809380</k1>
+        <k2>-0.257429 </k2>
+        <k3>0.0</k3>
+        <p1>-0.002955</p1>
+        <p2>0.003629</p2>
+        <center>0.5 0.5</center>
+    </distortion>
+    </camera>
+    <!-- Sensor camera -->
+    <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>
+            true
+        </alwaysOn>
+        <updateRate>
+            30.0
+        </updateRate>
+        <cameraName>
+            gpg
+        </cameraName>
+        <imageTopicName> 
+            image
+        </imageTopicName>
+        <cameraInfoTopicName>
+            camera_info
+        </cameraInfoTopicName>
+        <frameName>
+            camera_link
+        </frameName>
+        <hackBaseline>
+            0.0
+        </hackBaseline>
+        <distortionK1>0.0809380</distortionK1>
+        <distortionK2>-0.257429</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>-0.002955</distortionT1>
+        <distortionT2>0.003629</distortionT2>
+        <!--<distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2> -->
+    </plugin>
+    </sensor>        
+</gazebo>
+<!-- ros_control plugin-->
+<gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>
+            /gpg
+        </robotNamespace>
+        <legacyModeNS>
+            false
+        </legacyModeNS>
+    </plugin>
+</gazebo>
+
+
+</robot>
