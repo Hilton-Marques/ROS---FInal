@@ -46,11 +46,11 @@ if __name__ == '__main__':
         sent_msg = Twist()
         norm = hypot(trans.point.x, trans.point.y)
         angle = atan2(trans.point.y, trans.point.x)   
-        sent_msg.linear.x = 0.4*norm
+        sent_msg.linear.x = 0.4*0
         sent_msg.linear.y = 0
         sent_msg.linear.z = 0
 
-        sent_msg.angular.z = 0.7*angle
+        sent_msg.angular.z = 0.7*0
         sent_msg.angular.x = 0
         sent_msg.angular.y = 0
 
